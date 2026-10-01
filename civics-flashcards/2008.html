@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Civics 2008 Extras — Flashcards</title>
+<style>
+  :root {
+    --ink: #1a2332;
+    --paper: #f7f4ec;
+    --navy: #16243f;
+    --red: #9e1b32;
+    --gold: #b08d3f;
+    --line: #d6cdba;
+    --green: #2e6b4f;
+    --muted: #6b6452;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: Georgia, 'Times New Roman', serif;
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+    padding: 1.25rem;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; }
+
+  header {
+    text-align: center;
+    border-bottom: 3px double var(--navy);
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+  }
+  .eyebrow {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.28em;
+    font-size: 0.6rem;
+    color: var(--red);
+    font-weight: 700;
+  }
+  h1 {
+    font-size: 1.7rem;
+    color: var(--navy);
+    margin: 0.35rem 0 0.15rem;
+    line-height: 1.12;
+  }
+  .stars { color: var(--gold); letter-spacing: 0.5em; font-size: 0.7rem; margin-top: 0.3rem; }
+  .sub {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.72rem;
+    color: var(--muted);
+    margin-top: 0.6rem;
+    line-height: 1.5;
+    max-width: 560px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+    margin: 1rem 0;
+  }
+  .seg {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    border: 1.5px solid var(--navy);
+    background: transparent;
+    color: var(--navy);
+    padding: 0.42rem 0.8rem;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.15s;
+  }
+  .seg:hover { background: rgba(22,36,63,0.06); }
+  .seg.active { background: var(--navy); color: var(--paper); }
+
+  .meta {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    text-align: center;
+    font-size: 0.72rem;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+  }
+  .progress-track { height: 4px; background: var(--line); border-radius: 4px; overflow: hidden; margin-bottom: 1.25rem; }
+  .progress-fill { height: 100%; background: var(--red); transition: width 0.3s; width: 0; }
+
+  .card { position: relative; perspective: 1600px; height: 340px; margin-bottom: 1.1rem; }
+  .card-inner {
+    position: absolute; inset: 0;
+    transition: transform 0.55s cubic-bezier(.2,.7,.2,1);
+    transform-style: preserve-3d; cursor: pointer;
+  }
+  .card.flipped .card-inner { transform: rotateY(180deg); }
+  .face {
+    position: absolute; inset: 0;
+    backface-visibility: hidden; -webkit-backface-visibility: hidden;
+    border-radius: 6px; padding: 1.6rem 1.5rem;
+    display: flex; flex-direction: column;
+    border: 1px solid var(--line);
+    box-shadow: 0 10px 30px -16px rgba(22,36,63,0.45);
+  }
+  .face-front { background: #fffdf7; }
+  .face-back { background: var(--navy); color: var(--paper); transform: rotateY(180deg); }
+
+  .card-top {
+    display: flex; justify-content: space-between; align-items: center;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.62rem; letter-spacing: 0.14em; text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+  .face-front .qnum { color: var(--red); font-weight: 700; }
+  .face-front .cat { color: var(--muted); text-align: right; max-width: 60%; }
+  .face-back .qnum { color: var(--gold); font-weight: 700; }
+
+  .q-text { font-size: 1.3rem; line-height: 1.4; color: var(--navy); flex: 1; display: flex; align-items: center; }
+  .face-back .a-label {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 0.6rem;
+  }
+  .a-list { flex: 1; overflow-y: auto; }
+  .a-list ul { list-style: none; }
+  .a-list li { font-size: 1.04rem; line-height: 1.45; padding: 0.28rem 0 0.28rem 1.1rem; position: relative; }
+  .a-list li::before { content: "★"; position: absolute; left: 0; color: var(--gold); font-size: 0.65rem; top: 0.5rem; }
+  .a-note { font-size: 0.82rem; font-style: italic; color: #c9bfa6; margin-top: 0.7rem; line-height: 1.4; }
+  .flip-hint {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.58rem; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--muted); text-align: center; margin-top: 0.8rem;
+  }
+  .face-back .flip-hint { color: #8b9bb5; }
+
+  .nav { display: flex; gap: 0.6rem; align-items: stretch; }
+  .nav button {
+    flex: 1;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em;
+    border: 1.5px solid var(--navy); background: var(--navy); color: var(--paper);
+    padding: 0.7rem; cursor: pointer; border-radius: 3px; transition: opacity 0.15s;
+  }
+  .nav button:hover { opacity: 0.88; }
+  .nav button:disabled { opacity: 0.3; cursor: default; }
+  .nav .know { flex: 0 0 auto; background: transparent; color: var(--green); border-color: var(--green); min-width: 120px; }
+  .nav .know.marked { background: var(--green); color: var(--paper); }
+
+  .footnote {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    text-align: center; font-size: 0.66rem; color: var(--muted);
+    margin-top: 1.4rem; line-height: 1.6;
+    border-top: 1px solid var(--line); padding-top: 0.9rem;
+  }
+  @media (max-width: 480px) {
+    .q-text { font-size: 1.12rem; }
+    .card { height: 360px; }
+    .nav .know { min-width: 92px; font-size: 0.68rem; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">U.S. Naturalization — 2008 Test, Extras Only</div>
+    <h1>Questions Not in the 2025 Test</h1>
+    <div class="stars">★ ★ ★ ★</div>
+    <p class="sub">These cards cover only the 2008-version questions whose content isn't tested anywhere in the 2025 version you've already studied. Questions that overlap — even reworded or with slightly different answers — are left out.</p>
+  </header>
+
+  <div class="controls" id="controls">
+    <button class="seg active" data-filter="all">All</button>
+    <button class="seg" data-filter="unknown">Still learning</button>
+    <button class="seg" data-filter="shuffle">Shuffle</button>
+  </div>
+
+  <div class="meta" id="meta"></div>
+  <div class="progress-track"><div class="progress-fill" id="progress"></div></div>
+
+  <div class="card" id="card">
+    <div class="card-inner" id="cardInner">
+      <div class="face face-front">
+        <div class="card-top">
+          <span class="qnum" id="frontNum"></span>
+          <span class="cat" id="frontCat"></span>
+        </div>
+        <div class="q-text" id="qText"></div>
+        <div class="flip-hint">Tap card to reveal answer</div>
+      </div>
+      <div class="face face-back">
+        <div class="card-top">
+          <span class="qnum" id="backNum"></span>
+          <span id="backWhy"></span>
+        </div>
+        <div class="a-label">Accepted Answers</div>
+        <div class="a-list" id="aList"></div>
+        <div class="flip-hint">Tap to see question</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav">
+    <button id="prev">‹ Prev</button>
+    <button class="know" id="know">Got it ✓</button>
+    <button id="next">Next ›</button>
+  </div>
+
+  <div style="text-align:center;margin-top:1.2rem;">
+    <button class="seg" id="reset">Reset progress</button>
+  </div>
+
+  <div class="footnote" id="foot"></div>
+</div>
+
+<script>
+// 2008-version questions whose content is absent from the 2025 version.
+// "orig" = question number on the 2008 test.
+const DATA = [
+  {n:1,orig:10,c:"Principles of Democracy",q:"What is freedom of religion?",a:["You can practice any religion, or not practice a religion."]},
+  {n:2,orig:31,c:"System of Government",q:"If both the President and the Vice President can no longer serve, who becomes President?",a:["The Speaker of the House"]},
+  {n:3,orig:45,c:"System of Government",q:"What are the two major political parties in the United States?",a:["Democratic and Republican"]},
+  {n:4,orig:46,c:"System of Government",q:"What is the political party of the President now?",a:["Check uscis.gov/citizenship/testupdates"],note:"This answer changes with the administration — verify before your interview."},
+  {n:5,orig:49,c:"Rights & Responsibilities",q:"What is one responsibility that is only for United States citizens?",a:["Serve on a jury","Vote in a federal election"]},
+  {n:6,orig:50,c:"Rights & Responsibilities",q:"Name one right only for United States citizens.",a:["Vote in a federal election","Run for federal office"]},
+  {n:7,orig:74,c:"The 1800s",q:"Name one problem that led to the Civil War.",a:["Slavery","Economic reasons","States’ rights"]},
+  {n:8,orig:79,c:"Recent American History",q:"Who was President during World War I?",a:["(Woodrow) Wilson"]},
+  {n:9,orig:81,c:"Recent American History",q:"Who did the United States fight in World War II?",a:["Japan, Germany, and Italy"]},
+  {n:10,orig:88,c:"Geography",q:"Name one of the two longest rivers in the United States.",a:["Missouri (River)","Mississippi (River)"]},
+  {n:11,orig:89,c:"Geography",q:"What ocean is on the West Coast of the United States?",a:["Pacific (Ocean)"]},
+  {n:12,orig:90,c:"Geography",q:"What ocean is on the East Coast of the United States?",a:["Atlantic (Ocean)"]},
+  {n:13,orig:91,c:"Geography",q:"Name one U.S. territory.",a:["Puerto Rico","U.S. Virgin Islands","American Samoa","Northern Mariana Islands","Guam"]},
+  {n:14,orig:92,c:"Geography",q:"Name one state that borders Canada.",a:["Maine, New Hampshire, Vermont, New York","Pennsylvania, Ohio, Michigan, Minnesota","North Dakota, Montana, Idaho","Washington, Alaska"]},
+  {n:15,orig:93,c:"Geography",q:"Name one state that borders Mexico.",a:["California","Arizona","New Mexico","Texas"]}
+];
+
+const STORAGE_KEY = "civics-flashcards-2008-v1";
+let known = {};
+let deck = [];
+let idx = 0;
+let filter = "all";
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const saved = JSON.parse(raw);
+      known = saved.known || {};
+      filter = saved.filter || "all";
+    }
+  } catch (e) {}
+}
+function saveState() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ known: known, filter: filter })); } catch (e) {}
+}
+
+const card = document.getElementById('card');
+const cardInner = document.getElementById('cardInner');
+
+function buildDeck() {
+  let base = DATA.slice();
+  if (filter === "unknown") base = base.filter(d => !known[d.n]);
+  if (filter === "shuffle") {
+    base = DATA.slice();
+    for (let i = base.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [base[i], base[j]] = [base[j], base[i]];
+    }
+  }
+  deck = base;
+  if (deck.length === 0) deck = DATA.slice();
+  idx = 0;
+}
+
+function render() {
+  card.classList.remove('flipped');
+  const d = deck[idx];
+  document.getElementById('frontNum').textContent = "Card " + d.n;
+  document.getElementById('frontCat').textContent = d.c;
+  document.getElementById('qText').textContent = d.q;
+  document.getElementById('backNum').textContent = "2008 Q" + d.orig;
+  document.getElementById('backWhy').textContent = "";
+  let html = "<ul>" + d.a.map(x => "<li>" + x + "</li>").join("") + "</ul>";
+  if (d.note) html += "<div class='a-note'>" + d.note + "</div>";
+  document.getElementById('aList').innerHTML = html;
+
+  document.getElementById('meta').textContent =
+    "Card " + (idx + 1) + " of " + deck.length + "  ·  " +
+    Object.keys(known).length + " marked as known";
+  document.getElementById('progress').style.width = ((idx + 1) / deck.length * 100) + "%";
+
+  const knowBtn = document.getElementById('know');
+  knowBtn.classList.toggle('marked', !!known[d.n]);
+  knowBtn.textContent = known[d.n] ? "Known ✓" : "Got it ✓";
+
+  document.getElementById('prev').disabled = idx === 0;
+  document.getElementById('next').disabled = idx === deck.length - 1;
+}
+
+cardInner.addEventListener('click', () => card.classList.toggle('flipped'));
+document.getElementById('prev').addEventListener('click', () => { if (idx > 0) { idx--; render(); }});
+document.getElementById('next').addEventListener('click', () => { if (idx < deck.length - 1) { idx++; render(); }});
+document.getElementById('know').addEventListener('click', () => {
+  const n = deck[idx].n;
+  if (known[n]) delete known[n]; else known[n] = true;
+  saveState();
+  render();
+});
+
+document.querySelectorAll('.seg[data-filter]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.seg[data-filter]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    filter = btn.dataset.filter;
+    saveState();
+    buildDeck();
+    render();
+  });
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight') { if (idx < deck.length - 1) { idx++; render(); }}
+  else if (e.key === 'ArrowLeft') { if (idx > 0) { idx--; render(); }}
+  else if (e.key === ' ') { e.preventDefault(); card.classList.toggle('flipped'); }
+});
+
+document.getElementById('reset').addEventListener('click', () => {
+  if (confirm("Clear all saved progress? This cannot be undone.")) {
+    known = {};
+    filter = "all";
+    try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+    document.querySelectorAll('.seg[data-filter]').forEach(b =>
+      b.classList.toggle('active', b.dataset.filter === "all"));
+    buildDeck();
+    render();
+  }
+});
+
+document.getElementById('foot').innerHTML =
+  "Covers the content the 2025 test dropped — Geography (rivers, oceans, borders, territories) is the biggest gap, plus the two political parties, presidential succession to the Speaker, WWI/WWII specifics, and citizen-only rights.<br>" +
+  "“current official” answers may change — verify at uscis.gov/citizenship/testupdates";
+
+loadState();
+document.querySelectorAll('.seg[data-filter]').forEach(b =>
+  b.classList.toggle('active', b.dataset.filter === filter));
+buildDeck();
+render();
+</script>
+</body>
+</html>
