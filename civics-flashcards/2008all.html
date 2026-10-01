@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Civics Test Flashcards — 2008</title>
+<style>
+  :root {
+    --ink: #1a2332;
+    --paper: #f7f4ec;
+    --navy: #16243f;
+    --red: #9e1b32;
+    --gold: #b08d3f;
+    --line: #d6cdba;
+    --green: #2e6b4f;
+    --muted: #6b6452;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: Georgia, 'Times New Roman', serif;
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+    padding: 1.25rem;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; }
+
+  header {
+    text-align: center;
+    border-bottom: 3px double var(--navy);
+    padding-bottom: 1rem;
+    margin-bottom: 1.25rem;
+  }
+  .eyebrow {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.32em;
+    font-size: 0.62rem;
+    color: var(--red);
+    font-weight: 700;
+  }
+  h1 {
+    font-size: 1.85rem;
+    color: var(--navy);
+    letter-spacing: 0.01em;
+    margin: 0.35rem 0 0.15rem;
+    line-height: 1.1;
+  }
+  .stars { color: var(--gold); letter-spacing: 0.5em; font-size: 0.7rem; margin-top: 0.3rem; }
+
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+    margin-bottom: 1rem;
+  }
+  .seg {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    border: 1.5px solid var(--navy);
+    background: transparent;
+    color: var(--navy);
+    padding: 0.42rem 0.8rem;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.15s;
+  }
+  .seg:hover { background: rgba(22,36,63,0.06); }
+  .seg.active { background: var(--navy); color: var(--paper); }
+
+  .meta {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    text-align: center;
+    font-size: 0.72rem;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+  }
+  .progress-track { height: 4px; background: var(--line); border-radius: 4px; overflow: hidden; margin-bottom: 1.25rem; }
+  .progress-fill { height: 100%; background: var(--red); transition: width 0.3s; width: 0; }
+
+  .card {
+    position: relative;
+    perspective: 1600px;
+    height: 340px;
+    margin-bottom: 1.1rem;
+  }
+  .card-inner {
+    position: absolute;
+    inset: 0;
+    transition: transform 0.55s cubic-bezier(.2,.7,.2,1);
+    transform-style: preserve-3d;
+    cursor: pointer;
+  }
+  .card.flipped .card-inner { transform: rotateY(180deg); }
+  .face {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    border-radius: 6px;
+    padding: 1.6rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--line);
+    box-shadow: 0 10px 30px -16px rgba(22,36,63,0.45);
+  }
+  .face-front { background: #fffdf7; }
+  .face-back { background: var(--navy); color: var(--paper); transform: rotateY(180deg); }
+
+  .card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+  .face-front .qnum { color: var(--red); font-weight: 700; }
+  .face-front .cat { color: var(--muted); text-align: right; max-width: 60%; }
+  .face-back .qnum { color: var(--gold); font-weight: 700; }
+  .star-badge { color: var(--gold); }
+
+  .q-text {
+    font-size: 1.32rem;
+    line-height: 1.4;
+    color: var(--navy);
+    flex: 1;
+    display: flex;
+    align-items: center;
+  }
+  .face-back .a-label {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 0.6rem;
+  }
+  .a-list { flex: 1; overflow-y: auto; }
+  .a-list ul { list-style: none; }
+  .a-list li {
+    font-size: 1.04rem;
+    line-height: 1.45;
+    padding: 0.28rem 0 0.28rem 1.1rem;
+    position: relative;
+  }
+  .a-list li::before {
+    content: "★";
+    position: absolute;
+    left: 0;
+    color: var(--gold);
+    font-size: 0.65rem;
+    top: 0.5rem;
+  }
+  .a-note {
+    font-size: 0.82rem;
+    font-style: italic;
+    color: #c9bfa6;
+    margin-top: 0.7rem;
+    line-height: 1.4;
+  }
+  .flip-hint {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.58rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: center;
+    margin-top: 0.8rem;
+  }
+  .face-back .flip-hint { color: #8b9bb5; }
+
+  .nav { display: flex; gap: 0.6rem; align-items: stretch; }
+  .nav button {
+    flex: 1;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    border: 1.5px solid var(--navy);
+    background: var(--navy);
+    color: var(--paper);
+    padding: 0.7rem;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: opacity 0.15s;
+  }
+  .nav button:hover { opacity: 0.88; }
+  .nav button:disabled { opacity: 0.3; cursor: default; }
+  .nav .know {
+    flex: 0 0 auto;
+    background: transparent;
+    color: var(--green);
+    border-color: var(--green);
+    min-width: 120px;
+  }
+  .nav .know.marked { background: var(--green); color: var(--paper); }
+
+  .footnote {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    text-align: center;
+    font-size: 0.66rem;
+    color: var(--muted);
+    margin-top: 1.4rem;
+    line-height: 1.6;
+    border-top: 1px solid var(--line);
+    padding-top: 0.9rem;
+  }
+  @media (max-width: 480px) {
+    .q-text { font-size: 1.12rem; }
+    .card { height: 360px; }
+    .nav .know { min-width: 92px; font-size: 0.68rem; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">U.S. Naturalization — 2008 Civics Test</div>
+    <h1>100 Questions</h1>
+    <div class="stars">★ ★ ★ ★</div>
+  </header>
+
+  <div class="controls" id="controls">
+    <button class="seg active" data-filter="all">All 100</button>
+    <button class="seg" data-filter="star">65/20 (★ only)</button>
+    <button class="seg" data-filter="unknown">Still learning</button>
+    <button class="seg" data-filter="shuffle">Shuffle</button>
+  </div>
+
+  <div class="meta" id="meta"></div>
+  <div class="progress-track"><div class="progress-fill" id="progress"></div></div>
+
+  <div class="card" id="card">
+    <div class="card-inner" id="cardInner">
+      <div class="face face-front">
+        <div class="card-top">
+          <span class="qnum" id="frontNum"></span>
+          <span class="cat" id="frontCat"></span>
+        </div>
+        <div class="q-text" id="qText"></div>
+        <div class="flip-hint">Tap card to reveal answer</div>
+      </div>
+      <div class="face face-back">
+        <div class="card-top">
+          <span class="qnum" id="backNum"></span>
+          <span class="star-badge" id="backStar"></span>
+        </div>
+        <div class="a-label">Accepted Answers</div>
+        <div class="a-list" id="aList"></div>
+        <div class="flip-hint">Tap to see question</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav">
+    <button id="prev">‹ Prev</button>
+    <button class="know" id="know">Got it ✓</button>
+    <button id="next">Next ›</button>
+  </div>
+
+  <div style="text-align:center;margin-top:1.2rem;">
+    <button class="seg" id="reset">Reset progress</button>
+  </div>
+
+  <div class="footnote" id="foot"></div>
+</div>
+
+<script>
+const DATA = [
+  {n:1,c:"Principles of Democracy",star:true,q:"What is the supreme law of the land?",a:["The Constitution"]},
+  {n:2,c:"Principles of Democracy",q:"What does the Constitution do?",a:["Sets up the government","Defines the government","Protects basic rights of Americans"]},
+  {n:3,c:"Principles of Democracy",q:"The idea of self-government is in the first three words of the Constitution. What are these words?",a:["We the People"]},
+  {n:4,c:"Principles of Democracy",q:"What is an amendment?",a:["A change (to the Constitution)","An addition (to the Constitution)"]},
+  {n:5,c:"Principles of Democracy",q:"What do we call the first ten amendments to the Constitution?",a:["The Bill of Rights"]},
+  {n:6,c:"Principles of Democracy",star:true,q:"What is one right or freedom from the First Amendment?",a:["Speech","Religion","Assembly","Press","Petition the government"]},
+  {n:7,c:"Principles of Democracy",q:"How many amendments does the Constitution have?",a:["Twenty-seven (27)"]},
+  {n:8,c:"Principles of Democracy",q:"What did the Declaration of Independence do?",a:["Announced our independence (from Great Britain)","Declared our independence (from Great Britain)","Said that the United States is free (from Great Britain)"]},
+  {n:9,c:"Principles of Democracy",q:"What are two rights in the Declaration of Independence?",a:["Life","Liberty","Pursuit of happiness"]},
+  {n:10,c:"Principles of Democracy",q:"What is freedom of religion?",a:["You can practice any religion, or not practice a religion."]},
+  {n:11,c:"Principles of Democracy",star:true,q:"What is the economic system in the United States?",a:["Capitalist economy","Market economy"]},
+  {n:12,c:"Principles of Democracy",q:"What is the “rule of law”?",a:["Everyone must follow the law.","Leaders must obey the law.","Government must obey the law.","No one is above the law."]},
+  {n:13,c:"System of Government",star:true,q:"Name one branch or part of the government.",a:["Congress","Legislative","President","Executive","The courts","Judicial"]},
+  {n:14,c:"System of Government",q:"What stops one branch of government from becoming too powerful?",a:["Checks and balances","Separation of powers"]},
+  {n:15,c:"System of Government",q:"Who is in charge of the executive branch?",a:["The President"]},
+  {n:16,c:"System of Government",q:"Who makes federal laws?",a:["Congress","Senate and House (of Representatives)","(U.S. or national) legislature"]},
+  {n:17,c:"System of Government",star:true,q:"What are the two parts of the U.S. Congress?",a:["The Senate and House (of Representatives)"]},
+  {n:18,c:"System of Government",q:"How many U.S. Senators are there?",a:["One hundred (100)"]},
+  {n:19,c:"System of Government",q:"We elect a U.S. Senator for how many years?",a:["Six (6)"]},
+  {n:20,c:"System of Government",star:true,q:"Who is one of your state’s U.S. Senators now?",a:["Answers will vary."],note:"D.C. and U.S. territory residents answer that their area has no U.S. Senators."},
+  {n:21,c:"System of Government",q:"The House of Representatives has how many voting members?",a:["Four hundred thirty-five (435)"]},
+  {n:22,c:"System of Government",q:"We elect a U.S. Representative for how many years?",a:["Two (2)"]},
+  {n:23,c:"System of Government",q:"Name your U.S. Representative.",a:["Answers will vary."],note:"Territory residents may name their Delegate or Commissioner, or state the territory has no voting Representative."},
+  {n:24,c:"System of Government",q:"Who does a U.S. Senator represent?",a:["All people of the state"]},
+  {n:25,c:"System of Government",q:"Why do some states have more Representatives than other states?",a:["(Because of) the state’s population","(Because) they have more people","(Because) some states have more people"]},
+  {n:26,c:"System of Government",q:"We elect a President for how many years?",a:["Four (4)"]},
+  {n:27,c:"System of Government",star:true,q:"In what month do we vote for President?",a:["November"]},
+  {n:28,c:"System of Government",star:true,q:"What is the name of the President of the United States now?",a:["Check uscis.gov/citizenship/testupdates"],note:"This answer can change — verify the current President before your interview."},
+  {n:29,c:"System of Government",q:"What is the name of the Vice President of the United States now?",a:["Check uscis.gov/citizenship/testupdates"],note:"This answer can change — verify the current Vice President before your interview."},
+  {n:30,c:"System of Government",q:"If the President can no longer serve, who becomes President?",a:["The Vice President"]},
+  {n:31,c:"System of Government",q:"If both the President and the Vice President can no longer serve, who becomes President?",a:["The Speaker of the House"]},
+  {n:32,c:"System of Government",q:"Who is the Commander in Chief of the military?",a:["The President"]},
+  {n:33,c:"System of Government",q:"Who signs bills to become laws?",a:["The President"]},
+  {n:34,c:"System of Government",q:"Who vetoes bills?",a:["The President"]},
+  {n:35,c:"System of Government",q:"What does the President’s Cabinet do?",a:["Advises the President"]},
+  {n:36,c:"System of Government",q:"What are two Cabinet-level positions?",a:["Secretary of Agriculture, Commerce, Defense, Education","Secretary of Energy, Health and Human Services","Secretary of Homeland Security, Housing and Urban Development","Secretary of the Interior, Labor, State, Transportation","Secretary of the Treasury, Veterans Affairs","Attorney General","Vice President"]},
+  {n:37,c:"System of Government",q:"What does the judicial branch do?",a:["Reviews laws","Explains laws","Resolves disputes (disagreements)","Decides if a law goes against the Constitution"]},
+  {n:38,c:"System of Government",star:true,q:"What is the highest court in the United States?",a:["The Supreme Court"]},
+  {n:39,c:"System of Government",q:"How many justices are on the Supreme Court?",a:["Check uscis.gov/citizenship/testupdates"],note:"The 2008 test directs you to verify the current number of justices."},
+  {n:40,c:"System of Government",q:"Who is the Chief Justice of the United States now?",a:["Check uscis.gov/citizenship/testupdates"],note:"This answer can change — verify the current Chief Justice before your interview."},
+  {n:41,c:"System of Government",q:"Under our Constitution, some powers belong to the federal government. What is one power of the federal government?",a:["To print money","To declare war","To create an army","To make treaties"]},
+  {n:42,c:"System of Government",q:"Under our Constitution, some powers belong to the states. What is one power of the states?",a:["Provide schooling and education","Provide protection (police)","Provide safety (fire departments)","Give a driver’s license","Approve zoning and land use"]},
+  {n:43,c:"System of Government",star:true,q:"Who is the Governor of your state now?",a:["Answers will vary."],note:"D.C. residents answer that D.C. does not have a Governor."},
+  {n:44,c:"System of Government",star:true,q:"What is the capital of your state?",a:["Answers will vary."],note:"D.C. is not a state. Territory residents name the capital of the territory."},
+  {n:45,c:"System of Government",star:true,q:"What are the two major political parties in the United States?",a:["Democratic and Republican"]},
+  {n:46,c:"System of Government",q:"What is the political party of the President now?",a:["Check uscis.gov/citizenship/testupdates"],note:"This answer changes with the administration — verify before your interview."},
+  {n:47,c:"System of Government",q:"What is the name of the Speaker of the House of Representatives now?",a:["Check uscis.gov/citizenship/testupdates"],note:"This answer can change — verify the current Speaker before your interview."},
+  {n:48,c:"Rights & Responsibilities",star:true,q:"There are four amendments to the Constitution about who can vote. Describe one of them.",a:["Citizens eighteen (18) and older (can vote).","You don’t have to pay (a poll tax) to vote.","Any citizen can vote. (Women and men can vote.)","A male citizen of any race (can vote)."]},
+  {n:49,c:"Rights & Responsibilities",star:true,q:"What is one responsibility that is only for United States citizens?",a:["Serve on a jury","Vote in a federal election"]},
+  {n:50,c:"Rights & Responsibilities",q:"Name one right only for United States citizens.",a:["Vote in a federal election","Run for federal office"]},
+  {n:51,c:"Rights & Responsibilities",q:"What are two rights of everyone living in the United States?",a:["Freedom of expression","Freedom of speech","Freedom of assembly","Freedom to petition the government","Freedom of religion","The right to bear arms"]},
+  {n:52,c:"Rights & Responsibilities",star:true,q:"What do we show loyalty to when we say the Pledge of Allegiance?",a:["The United States","The flag"]},
+  {n:53,c:"Rights & Responsibilities",q:"What is one promise you make when you become a United States citizen?",a:["Give up loyalty to other countries","Defend the Constitution and laws of the United States","Obey the laws of the United States","Serve in the U.S. military (if needed)","Serve (do important work for) the nation (if needed)","Be loyal to the United States"]},
+  {n:54,c:"Rights & Responsibilities",star:true,q:"How old do citizens have to be to vote for President?",a:["Eighteen (18) and older"]},
+  {n:55,c:"Rights & Responsibilities",q:"What are two ways that Americans can participate in their democracy?",a:["Vote","Join a political party","Help with a campaign","Join a civic or community group","Give an elected official your opinion on an issue","Call Senators and Representatives","Publicly support or oppose an issue or policy","Run for office","Write to a newspaper"]},
+  {n:56,c:"Rights & Responsibilities",star:true,q:"When is the last day you can send in federal income tax forms?",a:["April 15"]},
+  {n:57,c:"Rights & Responsibilities",q:"When must all men register for the Selective Service?",a:["At age eighteen (18)","Between eighteen (18) and twenty-six (26)"]},
+  {n:58,c:"Colonial Period & Independence",star:true,q:"What is one reason colonists came to America?",a:["Freedom","Political liberty","Religious freedom","Economic opportunity","Practice their religion","Escape persecution"]},
+  {n:59,c:"Colonial Period & Independence",q:"Who lived in America before the Europeans arrived?",a:["American Indians","Native Americans"]},
+  {n:60,c:"Colonial Period & Independence",q:"What group of people was taken to America and sold as slaves?",a:["Africans","People from Africa"]},
+  {n:61,c:"Colonial Period & Independence",q:"Why did the colonists fight the British?",a:["Because of high taxes (taxation without representation)","Because the British army stayed in their houses (boarding, quartering)","Because they didn’t have self-government"]},
+  {n:62,c:"Colonial Period & Independence",q:"Who wrote the Declaration of Independence?",a:["(Thomas) Jefferson"]},
+  {n:63,c:"Colonial Period & Independence",q:"When was the Declaration of Independence adopted?",a:["July 4, 1776"]},
+  {n:64,c:"Colonial Period & Independence",q:"There were 13 original states. Name three.",a:["New Hampshire, Massachusetts, Rhode Island, Connecticut","New York, New Jersey, Pennsylvania, Delaware","Maryland, Virginia, North Carolina","South Carolina, Georgia"]},
+  {n:65,c:"Colonial Period & Independence",q:"What happened at the Constitutional Convention?",a:["The Constitution was written.","The Founding Fathers wrote the Constitution."]},
+  {n:66,c:"Colonial Period & Independence",q:"When was the Constitution written?",a:["1787"]},
+  {n:67,c:"Colonial Period & Independence",q:"The Federalist Papers supported the passage of the U.S. Constitution. Name one of the writers.",a:["(James) Madison","(Alexander) Hamilton","(John) Jay","Publius"]},
+  {n:68,c:"Colonial Period & Independence",q:"What is one thing Benjamin Franklin is famous for?",a:["U.S. diplomat","Oldest member of the Constitutional Convention","First Postmaster General of the United States","Writer of “Poor Richard’s Almanac”","Started the first free libraries"]},
+  {n:69,c:"Colonial Period & Independence",q:"Who is the “Father of Our Country”?",a:["(George) Washington"]},
+  {n:70,c:"Colonial Period & Independence",star:true,q:"Who was the first President?",a:["(George) Washington"]},
+  {n:71,c:"The 1800s",q:"What territory did the United States buy from France in 1803?",a:["The Louisiana Territory","Louisiana"]},
+  {n:72,c:"The 1800s",q:"Name one war fought by the United States in the 1800s.",a:["War of 1812","Mexican-American War","Civil War","Spanish-American War"]},
+  {n:73,c:"The 1800s",q:"Name the U.S. war between the North and the South.",a:["The Civil War","The War between the States"]},
+  {n:74,c:"The 1800s",q:"Name one problem that led to the Civil War.",a:["Slavery","Economic reasons","States’ rights"]},
+  {n:75,c:"The 1800s",star:true,q:"What was one important thing that Abraham Lincoln did?",a:["Freed the slaves (Emancipation Proclamation)","Saved (or preserved) the Union","Led the United States during the Civil War"]},
+  {n:76,c:"The 1800s",q:"What did the Emancipation Proclamation do?",a:["Freed the slaves","Freed slaves in the Confederacy","Freed slaves in the Confederate states","Freed slaves in most Southern states"]},
+  {n:77,c:"The 1800s",q:"What did Susan B. Anthony do?",a:["Fought for women’s rights","Fought for civil rights"]},
+  {n:78,c:"Recent American History",star:true,q:"Name one war fought by the United States in the 1900s.",a:["World War I","World War II","Korean War","Vietnam War","(Persian) Gulf War"]},
+  {n:79,c:"Recent American History",q:"Who was President during World War I?",a:["(Woodrow) Wilson"]},
+  {n:80,c:"Recent American History",q:"Who was President during the Great Depression and World War II?",a:["(Franklin) Roosevelt"]},
+  {n:81,c:"Recent American History",q:"Who did the United States fight in World War II?",a:["Japan, Germany, and Italy"]},
+  {n:82,c:"Recent American History",q:"Before he was President, Eisenhower was a general. What war was he in?",a:["World War II"]},
+  {n:83,c:"Recent American History",q:"During the Cold War, what was the main concern of the United States?",a:["Communism"]},
+  {n:84,c:"Recent American History",q:"What movement tried to end racial discrimination?",a:["Civil rights (movement)"]},
+  {n:85,c:"Recent American History",star:true,q:"What did Martin Luther King, Jr. do?",a:["Fought for civil rights","Worked for equality for all Americans"]},
+  {n:86,c:"Recent American History",q:"What major event happened on September 11, 2001, in the United States?",a:["Terrorists attacked the United States."]},
+  {n:87,c:"Recent American History",q:"Name one American Indian tribe in the United States.",a:["Cherokee, Navajo, Sioux, Chippewa, Choctaw","Pueblo, Apache, Iroquois, Creek, Blackfeet","Seminole, Cheyenne, Arawak, Shawnee, Mohegan","Huron, Oneida, Lakota, Crow, Teton, Hopi, Inuit"]},
+  {n:88,c:"Geography",q:"Name one of the two longest rivers in the United States.",a:["Missouri (River)","Mississippi (River)"]},
+  {n:89,c:"Geography",q:"What ocean is on the West Coast of the United States?",a:["Pacific (Ocean)"]},
+  {n:90,c:"Geography",q:"What ocean is on the East Coast of the United States?",a:["Atlantic (Ocean)"]},
+  {n:91,c:"Geography",q:"Name one U.S. territory.",a:["Puerto Rico","U.S. Virgin Islands","American Samoa","Northern Mariana Islands","Guam"]},
+  {n:92,c:"Geography",q:"Name one state that borders Canada.",a:["Maine, New Hampshire, Vermont, New York","Pennsylvania, Ohio, Michigan, Minnesota","North Dakota, Montana, Idaho","Washington, Alaska"]},
+  {n:93,c:"Geography",q:"Name one state that borders Mexico.",a:["California","Arizona","New Mexico","Texas"]},
+  {n:94,c:"Geography",star:true,q:"What is the capital of the United States?",a:["Washington, D.C."]},
+  {n:95,c:"Geography",star:true,q:"Where is the Statue of Liberty?",a:["New York (Harbor)","Liberty Island"],note:"Also acceptable: New Jersey, near New York City, and on the Hudson (River)."},
+  {n:96,c:"Symbols",q:"Why does the flag have 13 stripes?",a:["Because there were 13 original colonies","Because the stripes represent the original colonies"]},
+  {n:97,c:"Symbols",star:true,q:"Why does the flag have 50 stars?",a:["Because there is one star for each state","Because each star represents a state","Because there are 50 states"]},
+  {n:98,c:"Symbols",q:"What is the name of the national anthem?",a:["The Star-Spangled Banner"]},
+  {n:99,c:"Holidays",star:true,q:"When do we celebrate Independence Day?",a:["July 4"]},
+  {n:100,c:"Holidays",q:"Name two national U.S. holidays.",a:["New Year’s Day","Martin Luther King, Jr. Day","Presidents’ Day","Memorial Day","Juneteenth","Independence Day","Labor Day","Columbus Day","Veterans Day","Thanksgiving","Christmas"]}
+];
+
+const STORAGE_KEY = "civics-flashcards-2008-full-v1";
+let known = {};
+let deck = [];
+let idx = 0;
+let filter = "all";
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const saved = JSON.parse(raw);
+      known = saved.known || {};
+      filter = saved.filter || "all";
+    }
+  } catch (e) {}
+}
+function saveState() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ known: known, filter: filter })); } catch (e) {}
+}
+
+const card = document.getElementById('card');
+const cardInner = document.getElementById('cardInner');
+
+function buildDeck() {
+  let base = DATA.slice();
+  if (filter === "star") base = base.filter(d => d.star);
+  else if (filter === "unknown") base = base.filter(d => !known[d.n]);
+  if (filter === "shuffle") {
+    base = DATA.slice();
+    for (let i = base.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [base[i], base[j]] = [base[j], base[i]];
+    }
+  }
+  deck = base;
+  if (deck.length === 0) deck = DATA.slice();
+  idx = 0;
+}
+
+function render() {
+  card.classList.remove('flipped');
+  const d = deck[idx];
+  document.getElementById('frontNum').textContent = "No. " + d.n + (d.star ? "  ★" : "");
+  document.getElementById('frontCat').textContent = d.c;
+  document.getElementById('qText').textContent = d.q;
+  document.getElementById('backNum').textContent = "No. " + d.n;
+  document.getElementById('backStar').textContent = d.star ? "★ 65/20" : "";
+  let html = "<ul>" + d.a.map(x => "<li>" + x + "</li>").join("") + "</ul>";
+  if (d.note) html += "<div class='a-note'>" + d.note + "</div>";
+  document.getElementById('aList').innerHTML = html;
+
+  document.getElementById('meta').textContent =
+    "Card " + (idx + 1) + " of " + deck.length + "  ·  " +
+    Object.keys(known).length + " marked as known";
+  document.getElementById('progress').style.width = ((idx + 1) / deck.length * 100) + "%";
+
+  const knowBtn = document.getElementById('know');
+  knowBtn.classList.toggle('marked', !!known[d.n]);
+  knowBtn.textContent = known[d.n] ? "Known ✓" : "Got it ✓";
+
+  document.getElementById('prev').disabled = idx === 0;
+  document.getElementById('next').disabled = idx === deck.length - 1;
+}
+
+cardInner.addEventListener('click', () => card.classList.toggle('flipped'));
+document.getElementById('prev').addEventListener('click', () => { if (idx > 0) { idx--; render(); }});
+document.getElementById('next').addEventListener('click', () => { if (idx < deck.length - 1) { idx++; render(); }});
+document.getElementById('know').addEventListener('click', () => {
+  const n = deck[idx].n;
+  if (known[n]) delete known[n]; else known[n] = true;
+  saveState();
+  render();
+});
+
+document.querySelectorAll('.seg[data-filter]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.seg[data-filter]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    filter = btn.dataset.filter;
+    saveState();
+    buildDeck();
+    render();
+  });
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight') { if (idx < deck.length - 1) { idx++; render(); }}
+  else if (e.key === 'ArrowLeft') { if (idx > 0) { idx--; render(); }}
+  else if (e.key === ' ') { e.preventDefault(); card.classList.toggle('flipped'); }
+});
+
+document.getElementById('reset').addEventListener('click', () => {
+  if (confirm("Clear all saved progress? This cannot be undone.")) {
+    known = {};
+    filter = "all";
+    try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+    document.querySelectorAll('.seg[data-filter]').forEach(b =>
+      b.classList.toggle('active', b.dataset.filter === "all"));
+    buildDeck();
+    render();
+  }
+});
+
+document.getElementById('foot').innerHTML =
+  "2008 test: up to 10 questions asked · answer 6 of 10 correctly to pass · 65/20 applicants study only the starred (★) questions<br>" +
+  "★ questions and “current official” answers may change — always verify at uscis.gov/citizenship/testupdates";
+
+loadState();
+document.querySelectorAll('.seg[data-filter]').forEach(b =>
+  b.classList.toggle('active', b.dataset.filter === filter));
+buildDeck();
+render();
+</script>
+</body>
+</html>
